@@ -7,7 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+@RestController
 @ControllerAdvice
 public class ErrorController {
 
@@ -17,15 +21,17 @@ public class ErrorController {
 	 * @access Private
 	 * 
 	 * @params Throwable e
+	 * @params HttpServletRequest request
 	 * @params HttpStatus status
 	 * 
 	 * @return ResponseEntity<BodyResponse<ErrorResponse>>
 	 */
-	private ResponseEntity<BodyResponse<ErrorResponse>> builder( Throwable e, HttpStatus status ) {
+	private ResponseEntity<BodyResponse<ErrorResponse>> builder( Throwable e, HttpServletRequest request, HttpStatus status ) {
 		return( new ResponseEntity<>( 
 			new BodyResponse<>( 
 				e.getMessage(), "failed", status.value(),
 				new ErrorResponse(
+					request.getServletPath(),
 					e.getClass().getName()
 				)
 			), 
@@ -35,7 +41,7 @@ public class ErrorController {
 
 	@ResponseBody
 	@ExceptionHandler( Throwable.class )
-	public ResponseEntity<BodyResponse<ErrorResponse>> common( Throwable e ) {
+	public ResponseEntity<BodyResponse<ErrorResponse>> common( Throwable e, HttpServletRequest request ) {
 		HttpStatus status = null;
 		switch( e.getClass().getSimpleName() ) {
 			case "AuthenticationException":
@@ -59,6 +65,7 @@ public class ErrorController {
 			case "NotFoundException":
 			case "TaskNotFoundException":
 			case "UserNotFoundException":
+			case "UsernameNotFoundException":
 				status = HttpStatus.NOT_FOUND;
 				break;
 			case "ServiceException":
@@ -68,7 +75,7 @@ public class ErrorController {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
 				break;
 		}
-		return( this.builder( e, status ) );
+		return( this.builder( e, request, status ) );
 	}
 
 }

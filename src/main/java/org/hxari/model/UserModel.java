@@ -1,58 +1,52 @@
 package org.hxari.model;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import org.hxari.payload.request.SignInRequest;
+import org.hxari.payload.request.SignUpRequest;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.hibernate.validator.constraints.Length;
 
 @Entity
 @Table( name="users" )
 public class UserModel {
+	
+	public enum Role {
+		ADMIN,
+		MODER,
+		USER
+	}
 
 	@Id
-	@GeneratedValue( strategy=GenerationType.IDENTITY )
-	private Long id;
+    @GeneratedValue( strategy=GenerationType.IDENTITY )
+    private Long id;
 
-	@Column( name="fullname", length=30, nullable=false )
+	@Enumerated( EnumType.STRING )
+	@Column( length=20, name="role", nullable=false, columnDefinition="ROLE_USER" )
+	private Role role;
+
+	@Column( length=32, name="fullname", nullable=false )
 	private String fullname;
 
-	@Column( name="username", length=30, nullable=false, unique=true )
-	@Length( min=3, message="Username length must be greater than 3 chars and lower than 30" )
-	private String username;
-
-	@Column( name="usermail", length=120, nullable=false, unique=true )
+	@Column( length=48, name="usermail", nullable=false, unique=true )
 	private String usermail;
 
-	@Column( name="password", length=386, nullable=false )
-	@Length( min=8, message="Password length must be greater than 8 chars" )
+	@Column( length=30, name="username", nullable=false, unique=true )
+	private String username;
+
+	@Column( length=258, name="password", nullable=false )
 	@JsonIgnore
 	private String password;
-
-	@ManyToMany( fetch=FetchType.LAZY)
-	@JoinTable( 
-		name="user_roles", 
-		joinColumns=@JoinColumn( name="user_id" ), 
-		inverseJoinColumns=@JoinColumn( name="role_id" )
-	)
-	private Set<RoleModel> roles = new HashSet<>();
 
 	@Column( name="created", nullable = false, updatable=false )
 	private Timestamp created;
@@ -60,70 +54,39 @@ public class UserModel {
 	@Column( name="updated", nullable=false, updatable=true )
 	private Timestamp updated;
 
-	// @OneToMany( mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true )
-	// @JsonIgnore
-	// private List<Collaborator> collaborators;
-
-	// @OneToMany( mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true )
-	// @JsonIgnore
-	// private List<Comment> comments;
-
-	// @OneToMany( mappedBy="owner", cascade=CascadeType.ALL, orphanRemoval=true )
-	// @JsonIgnore
-	// private List<Order> orders;
-
-	@OneToMany( mappedBy="owner", cascade=CascadeType.ALL, orphanRemoval=true )
-	@JsonIgnore
-	private List<TaskModel> tasks;
-
-	/*
-	 * Construct method of class UserModel.
-	 * 
-	 * @access Public Initialize
-	 * 
-	 * @return Void
-	 */
 	public UserModel() {
 		this.created = this.created != null ? this.created : Timestamp.valueOf( LocalDateTime.now() );
 		this.updated = this.updated != null ? this.updated : Timestamp.valueOf( LocalDateTime.now() );
 	}
 
-	/*
-	 * Construct overloading method of class UserModel.
-	 * 
-	 * @access Public Initialize
-	 * 
-	 * @params String username
-	 * @params String password
-	 * 
-	 * @return Void
-	 */
-	public UserModel( String username, String password ) {
+	public UserModel( SignInRequest signin ) {
 		this();
-		this.setUsermail( usermail );
-		this.setPassword( password );
+		this.username = signin.username();
+		this.password = signin.password();
 	}
 
-	/*
-	 * Construct overloading method of class UserModel.
-	 * 
-	 * @access Public Initialize
-	 * 
-	 * @params String fullname
-	 * @params String username
-	 * @params String usermail
-	 * @params String password
-	 * @params Set<RoleModel> roles
-	 * 
-	 * @return Void
-	 */
-	public UserModel( String fullname, String username, String usermail, String password, Set<RoleModel> roles ) {
+	public UserModel( SignInRequest signin, Role role ) {
 		this();
-		this.setRoles( roles );
-		this.setFullname( fullname );
-		this.setUsermail( usermail );
-		this.setUsermail( usermail );
-		this.setPassword( password );
+		this.role = role;
+		this.username = signin.username();
+		this.password = signin.password();
+	}
+
+	public UserModel( SignUpRequest signup ) {
+		this();
+		this.fullname = signup.fullname();
+		this.usermail = signup.usermail();
+		this.username = signup.username();
+		this.password = signup.password();
+	}
+
+	public UserModel( SignUpRequest signup, Role role ) {
+		this();
+		this.role = role;
+		this.fullname = signup.fullname();
+		this.usermail = signup.usermail();
+		this.username = signup.username();
+		this.password = signup.password();
 	}
 
 	public Long getId() {
@@ -146,8 +109,8 @@ public class UserModel {
 		return( this.password );
 	}
 
-	public Set<RoleModel> getRoles() {
-		return( roles );
+	public Role getRole() {
+		return( role );
 	}
 
 	public Timestamp getCreated() {
@@ -156,22 +119,6 @@ public class UserModel {
 
 	public Timestamp getUpdated() {
 		return( this.updated );
-	}
-
-	// public List<Collaborator> getCollaborators() {
-	// 	return( this.collaborators );
-	// }
-
-	// public List<Comment> getComments() {
-	// 	return( this.comments );
-	// }
-
-	// public List<Order> getOrders() {
-	// 	return( this.orders );
-	// }
-
-	public List<TaskModel> getTasks() {
-		return( this.tasks );
 	}
 
 	public UserModel setFullname( String fullname ) {
@@ -194,9 +141,9 @@ public class UserModel {
 		return( this );
 	}
 	
-	public UserModel setRoles( Set<RoleModel> roles ) {
-		this.roles = roles;
+	public UserModel setRole( Role role ) {
+		this.role = role;
 		return( this );
 	}
-
+	
 }
