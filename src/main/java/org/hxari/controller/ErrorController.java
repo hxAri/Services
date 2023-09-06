@@ -1,7 +1,7 @@
 package org.hxari.controller;
 
-import org.hxari.response.BodyResponse;
-import org.hxari.response.ErrorResponse;
+import org.hxari.payload.response.BodyResponse;
+import org.hxari.payload.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
-public class ErrorController
-{
+public class ErrorController {
 
 	/*
 	 * Response Entity builder for error response.
@@ -22,8 +21,7 @@ public class ErrorController
 	 * 
 	 * @return ResponseEntity<BodyResponse<ErrorResponse>>
 	 */
-	private ResponseEntity<BodyResponse<ErrorResponse>> builder( Throwable e, HttpStatus status )
-	{
+	private ResponseEntity<BodyResponse<ErrorResponse>> builder( Throwable e, HttpStatus status ) {
 		return( new ResponseEntity<>( 
 			new BodyResponse<>( 
 				e.getMessage(), "failed", status.value(),
@@ -37,11 +35,9 @@ public class ErrorController
 
 	@ResponseBody
 	@ExceptionHandler( Throwable.class )
-	public ResponseEntity<BodyResponse<ErrorResponse>> common( Throwable e )
-	{
+	public ResponseEntity<BodyResponse<ErrorResponse>> common( Throwable e ) {
 		HttpStatus status = null;
-		switch( e.getClass().getSimpleName() )
-		{
+		switch( e.getClass().getSimpleName() ) {
 			case "AuthenticationException":
 				status = HttpStatus.UNAUTHORIZED;
 				break;

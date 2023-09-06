@@ -1,112 +1,119 @@
 package org.hxari.controller;
 
-import org.hxari.component.AuthComponent;
-import org.hxari.exception.AuthenticationException;
-import org.hxari.exception.ServiceException;
-import org.hxari.exception.UserException;
-import org.hxari.exception.UserNotFoundException;
-import org.hxari.model.User;
-import org.hxari.request.UserRequest;
-import org.hxari.response.BodyResponse;
-import org.hxari.response.UserResponse;
-import org.hxari.service.UserService;
-import org.hxari.util.Security;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.hxari.component.JwtComponent;
+import org.hxari.exception.ClientException;
+import org.hxari.model.RoleModel;
+import org.hxari.model.UserModel;
+import org.hxari.model.RoleModel.Role;
+import org.hxari.payload.request.SignInRequest;
+import org.hxari.payload.request.SignUpRequest;
+import org.hxari.payload.response.BodyResponse;
+import org.hxari.payload.response.JwtResponse;
+import org.hxari.payload.response.UserResponse;
+import org.hxari.repository.RoleRepository;
+import org.hxari.repository.UserRepository;
+import org.hxari.service.UserDetailsServiceImplement.UserDetailsImplement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
+@CrossOrigin( maxAge=3600, origins="*" )
 @RestController
 @RequestMapping( path="/api/v1/auth" )
-public class AuthController
-{
+public class AuthController {
 
 	@Autowired
-	private AuthComponent auth;
+	private AuthenticationManager authManager;
+	
+	@Autowired
+	private JwtComponent jwtComponent;
 
 	@Autowired
-	private UserService service;
+	private PasswordEncoder paswEncoder;
 
-	@RequestMapping( path="/logout", method=RequestMethod.POST )
-	public ResponseEntity<BodyResponse<Void>> logout( HttpServletRequest request )
-	{
-		try
-		{
-			this.auth.filter( request );
-			this.auth.unauthorizate( request );
-			return( new ResponseEntity<>(
-				new BodyResponse<>( "success", "ok", 
-					HttpStatus.NO_CONTENT.value(),
-					null
-				),
-				HttpStatus.NO_CONTENT
-			));
-		}
-		catch( AuthenticationException e )
-		{
-			throw new ServiceException( "Service unavailable" );
-		}
-	}
+	@Autowired
+	private RoleRepository roleRepository;
+	
+	@Autowired
+	private UserRepository userRepository;
 
 	@RequestMapping( path="/signin", method=RequestMethod.POST )
-	public ResponseEntity<BodyResponse<UserResponse<User>>> signin( HttpServletRequest request, HttpServletResponse response, @RequestBody UserRequest body ) throws Exception
-	{
-		this.auth.filter( request );
-		User user = null;
-		try
-		{
-			user = this.service.findByUname( body.username() );
-		}
-		catch( UserNotFoundException e )
-		{
-			user = this.service.findByEmail( body.username() );
-		}
-		if( Security.verify( user.getPassword(), body.password() ) )
-		{
-			this.auth.authenticate( user, response );
-			return( new ResponseEntity<>(
-				new BodyResponse<>( "success", "ok", HttpStatus.OK.value(), 
-					new UserResponse<>(
-						user
-					)
-				),
-				HttpStatus.OK				
-			));
-		}
-		throw new UserException( "Invalid user password" );
+	public ResponseEntity<?> signin( @Valid @RequestBody SignInRequest body ) {
+		Authentication auth = this.authManager.authenticate(
+			new UsernamePasswordAuthenticationToken( 
+				body.username(), 
+				body.password() 
+			)
+		);
+		SecurityContextHolder.getContext().setAuthentication( auth );
+    	String jwt = this.jwtComponent.generateJwtToken( auth );
+		UserDetailsImplement user = ( UserDetailsImplement ) auth.getPrincipal();    
+		return( new ResponseEntity<>(
+			new BodyResponse<>( "success", "ok",
+				HttpStatus.OK.value(),
+				new JwtResponse(
+					jwt,
+					user
+				)
+			),
+			HttpStatus.OK
+		));
 	}
 
 	@RequestMapping( path="/signup", method=RequestMethod.POST )
-	public ResponseEntity<BodyResponse<UserResponse<User>>> signup( HttpServletRequest request, HttpServletResponse response, @RequestBody UserRequest body )
-	{
-		this.auth.filter( request );
-		try
-		{
-			User user = new User();
-			user.setFullname( body.fullname() )
-				.setUsername( body.username() )
-				.setUsermail( body.usermail() )
-				.setPassword( body.password() );
-			this.service.save( user );
-			this.auth.authenticate( user, response );
-			return( new ResponseEntity<>(
-				new BodyResponse<>( "success", "ok",
-					HttpStatus.OK.value(),
-					new UserResponse<>( user )
-				),
-				HttpStatus.OK
-			));
+	public ResponseEntity<?> signup( @Valid @RequestBody SignUpRequest body ) {
+		if( this.userRepository.existsByUsermail( body.usermail() ) ) 
+			throw new ClientException( "Email Address is already use" );
+		if( this.userRepository.existsByUsername( body.username() ) ) 
+			throw new ClientException( "Username is already taked" );
+		if( body.role().isEmpty() )
+			throw new ClientException( "User role required" );
+		Set<RoleModel> roles = new HashSet<>();
+		switch( body.role().toLowerCase() ) {
+			case "admin":
+				throw new ClientException( "Can resgister as Admin" );
+			case "moder":
+				throw new ClientException( "Only Admin can set user as Moder" );
+			case "user":
+				roles.add( this.roleRepository.findByRole( Role.MODER ).get() );
+				break;
+			default:
+				throw new ClientException( "Invalid user role" );
 		}
-		catch( Throwable e )
-		{
-			throw new UserException( String.format( "%s: %s", e.getClass().getName(), e.getMessage() ) );
-		}
+		UserModel user = new UserModel(
+			body.fullname(),
+			body.usermail(),
+			body.username(),
+			this.paswEncoder.encode( 
+				body.password() 
+			),
+			roles
+		);
+		this.userRepository.save( user );
+		return( new ResponseEntity<>(
+			new BodyResponse<>( "user registered", "ok",
+				HttpStatus.OK.value(),
+				new UserResponse<>(
+					user
+				)
+			),
+			HttpStatus.OK
+		));
 	}
 
 }
