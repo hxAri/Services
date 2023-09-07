@@ -53,6 +53,7 @@ public class ErrorController {
 			case "HttpMediaTypeNotSupportedException":
 				status = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 				break;
+			case "BadCredentialsException":
 			case "HttpMessageNotReadableException":
 			case "MissingServletRequestParameterException":
 			case "UserException":

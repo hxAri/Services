@@ -7,6 +7,8 @@ import org.hxari.service.UserDetailsServiceImplement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+// import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+// import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -19,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+// import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -52,6 +55,14 @@ public class SecurityConfig {
 		return( new BCryptPasswordEncoder() );
 	}
 
+	// @Bean
+	// public RoleHierarchy roleHierarchy() {
+	// 	RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+	// 	String hierarchy = "ROLE_ADMIN > ROLE_MODER > ROLE_MODER > ROLE_USER";
+	// 	roleHierarchy.setHierarchy(hierarchy);
+	// 	return roleHierarchy;
+	// }
+
 	@Bean
 	public SecurityFilterChain securityFilterChain( HttpSecurity http ) throws Exception {
 		return( http
@@ -60,12 +71,15 @@ public class SecurityConfig {
 				.requestMatchers( "/api/v1/auth" ).permitAll()
 				.requestMatchers( "/api/v1/auth/signin" ).permitAll()
 				.requestMatchers( "/api/v1/auth/signup" ).permitAll()
+				.requestMatchers( "/swagger-resources/*" ).permitAll()
+				.requestMatchers( "/swagger-ui/**" ).permitAll()
+				.requestMatchers( "/v3/api-docs/**" ).permitAll()
 			)
 			.authorizeHttpRequests( auth -> auth
 				.requestMatchers( "/api/v1/task/**" ).permitAll()
-				.requestMatchers( "/api/v1/user/**" ).permitAll()
-				.requestMatchers( "/api/v1/moder/**" ).permitAll()
-				.requestMatchers( "/api/v1/admin/**" ).permitAll()
+				.requestMatchers( "/api/v1/user/**" ).permitAll() //.hasRole( "USER" )
+				.requestMatchers( "/api/v1/moder/**" ).permitAll() //.hasRole( "MODER" )
+				.requestMatchers( "/api/v1/admin/**" ).permitAll() //.hasRole( "ADMIN" )
 				.anyRequest()
 				.authenticated()
 			)
@@ -84,5 +98,12 @@ public class SecurityConfig {
 	public UserDetailsService userDetailsService() {
 		return( new UserDetailsServiceImplement() );
 	}
+
+	// @Bean
+	// public DefaultWebSecurityExpressionHandler webSecurityExpressionHandler() {
+	// 	DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+	// 	expressionHandler.setRoleHierarchy( this.roleHierarchy() );
+	// 	return( expressionHandler );
+	// }
 
 }

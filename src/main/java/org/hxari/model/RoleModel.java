@@ -1,9 +1,9 @@
 package org.hxari.model;
 
+import org.hxari.model.UserModel.Role;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,41 +13,40 @@ import jakarta.persistence.Table;
 @Table( name="roles" )
 public class RoleModel {
 
-	@Id
-	@GeneratedValue( strategy=GenerationType.IDENTITY )
-	private Long id;
-
-	@Enumerated( EnumType.STRING )
-	@Column( length=20 )
-	private Role role;
-
+    @Id
+    @Column( name="id" )
+    @GeneratedValue( strategy=GenerationType.IDENTITY )
+    private Long id;
+    
+	@Column( length=24, name="role" )
+    private String role;
+	
 	public RoleModel() {
 	}
 
 	public RoleModel( Role role ) {
-		this.setRole( role );
+		this.setRol( role );
 	}
 
-	public Long getId() {
-		return( id );
+	public RoleModel( String role ) {
+		this.setRol( role );
 	}
 
-	public Role getRole() {
+    public Long getId() {
+        return( this.id );
+    }
+
+	public String getRole() {
 		return( this.role );
 	}
 
-	public String getRoleName() {
-		return( this.role.name() );
+	public RoleModel setRol( Role role ) {
+		return( this.setRol( role.value() ) );
 	}
 
-	public RoleModel setRole( Role role ) {
+	public RoleModel setRol( String role ) {
 		this.role = role;
 		return( this );
 	}
-
-	public enum Role {
-		ADMIN,
-		MODER,
-		USER
-	}
 }
+

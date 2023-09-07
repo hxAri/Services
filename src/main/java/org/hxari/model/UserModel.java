@@ -2,19 +2,24 @@ package org.hxari.model;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hxari.payload.request.SignInRequest;
 import org.hxari.payload.request.SignUpRequest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,18 +27,36 @@ import jakarta.persistence.Table;
 public class UserModel {
 	
 	public enum Role {
-		ADMIN,
-		MODER,
-		USER
+
+		ADMIN( "ROLE_ADMIN" ),
+		USER( "ROLE_USER" );
+
+		private String value;
+
+		private Role( String value ) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return( this.value );
+		}
+
+		public String value() {
+			return( this.value );
+		}
 	}
 
 	@Id
-    @GeneratedValue( strategy=GenerationType.IDENTITY )
-    private Long id;
+	@GeneratedValue( strategy=GenerationType.IDENTITY )
+	private Long id;
 
-	@Enumerated( EnumType.STRING )
-	@Column( length=20, name="role", nullable=false, columnDefinition="ROLE_USER" )
-	private Role role;
+	@ManyToMany( cascade=CascadeType.ALL, fetch=FetchType.EAGER )
+	@JoinTable(
+		name = "users_roles",
+		joinColumns = @JoinColumn( name="user_id" ),
+		inverseJoinColumns = @JoinColumn(name="role_id" )
+	)
+	private Set<RoleModel> roles = new HashSet<>();
 
 	@Column( length=32, name="fullname", nullable=false )
 	private String fullname;
@@ -65,9 +88,9 @@ public class UserModel {
 		this.password = signin.password();
 	}
 
-	public UserModel( SignInRequest signin, Role role ) {
+	public UserModel( SignInRequest signin, Set<RoleModel> roles ) {
 		this();
-		this.role = role;
+		this.roles = roles;
 		this.username = signin.username();
 		this.password = signin.password();
 	}
@@ -80,9 +103,9 @@ public class UserModel {
 		this.password = signup.password();
 	}
 
-	public UserModel( SignUpRequest signup, Role role ) {
+	public UserModel( SignUpRequest signup, Set<RoleModel> roles ) {
 		this();
-		this.role = role;
+		this.roles = roles;
 		this.fullname = signup.fullname();
 		this.usermail = signup.usermail();
 		this.username = signup.username();
@@ -109,8 +132,8 @@ public class UserModel {
 		return( this.password );
 	}
 
-	public Role getRole() {
-		return( role );
+	public Set<RoleModel> getRoles() {
+		return( roles );
 	}
 
 	public Timestamp getCreated() {
@@ -141,8 +164,8 @@ public class UserModel {
 		return( this );
 	}
 	
-	public UserModel setRole( Role role ) {
-		this.role = role;
+	public UserModel setRoles( Set<RoleModel> roles ) {
+		this.roles = roles;
 		return( this );
 	}
 	

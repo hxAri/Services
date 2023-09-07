@@ -1,11 +1,13 @@
 package org.hxari.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.hxari.model.RoleModel;
 import org.hxari.model.UserModel;
-import org.hxari.model.UserModel.Role;
 import org.hxari.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Service
 public class UserDetailsServiceImplement implements UserDetailsService {
@@ -28,21 +32,34 @@ public class UserDetailsServiceImplement implements UserDetailsService {
 	public class UserDetailsImplement implements UserDetails {
 
 		private Long id;
+		private String fullname;
+		private String usermail;
 		private String username;
+		@JsonIgnore
 		private String password;
-		private Role role;
+		private Set<RoleModel> roles;
 		
 		public UserDetailsImplement( UserModel user ) {
 			this.id = user.getId();
-			this.role = user.getRole();
+			this.roles = user.getRoles();
+			this.fullname = user.getFullname();
+			this.usermail = user.getUsermail();
 			this.username = user.getUsername();
 			this.password = user.getPassword();
 		}
 
 		@Override
 		public Collection<? extends GrantedAuthority> getAuthorities() {
-			SimpleGrantedAuthority authority = new SimpleGrantedAuthority( this.role.name() );
-        	return( Collections.singletonList( authority ) );
+        	Set<RoleModel> roles = this.roles;
+			List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+			for( RoleModel role : roles ) {
+				authorities.add( new SimpleGrantedAuthority( role.getRole() ) );
+			}
+			return( authorities );
+		}
+
+		public String getFullname() {
+			return( this.fullname );
 		}
 
 		public Long getId() {
@@ -52,6 +69,10 @@ public class UserDetailsServiceImplement implements UserDetailsService {
 		@Override
 		public String getPassword() {
 			return( this.password );
+		}
+
+		public String getUsermail() {
+			return( this.usermail );
 		}
 
 		@Override

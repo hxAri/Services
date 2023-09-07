@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.hxari.model.UserModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,9 @@ public class JwtService {
 	
 	@Value( "${jwt.secret}" )
 	protected String SECRET;
+
+	@Autowired
+	private UserService userService;
 
 	public String extractUsername( String token ) {
 		return( this.extractClaim( token, Claims::getSubject ) );
@@ -65,6 +70,10 @@ public class JwtService {
 		);
 	}
 
+	public UserModel getUserModel( String token ) {
+		return( this.userService.findByUsername( this.extractUsername( token ) ) );
+	}
+
 	private Key getSignKey() {
 		byte[] keyBytes = Decoders.BASE64.decode( this.SECRET );
 		return Keys.hmacShaKeyFor( keyBytes );
@@ -76,7 +85,7 @@ public class JwtService {
 
 	public Boolean validateToken( String token, UserDetails user ) {
 		final String username = extractUsername( token );
-		return( username.equals( user.getUsername() ) && this.isTokenExpired( token ) );
+		return( username.equals( user.getUsername() ) && this.isTokenExpired( token ) == false );
 	}
 
 }
