@@ -25,11 +25,11 @@ public class RoleModel {
 	}
 
 	public RoleModel( Role role ) {
-		this.setRol( role );
+		this.setRole( role );
 	}
 
 	public RoleModel( String role ) {
-		this.setRol( role );
+		this.setRole( role );
 	}
 
     public Long getId() {
@@ -40,11 +40,11 @@ public class RoleModel {
 		return( this.role );
 	}
 
-	public RoleModel setRol( Role role ) {
-		return( this.setRol( role.value() ) );
+	public RoleModel setRole( Role role ) {
+		return( this.setRole( role.value() ) );
 	}
 
-	public RoleModel setRol( String role ) {
+	public RoleModel setRole( String role ) {
 		this.role = role;
 		return( this );
 	}

@@ -1,5 +1,6 @@
 package org.hxari.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,6 +14,9 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Configuration
 @OpenAPIDefinition
 public class OpenAPIConfig {
+
+	@Value( "${springdoc.swagger-ui.path}" )
+	private String path;
 
 	@Bean
 	public OpenAPI apiInfo() {

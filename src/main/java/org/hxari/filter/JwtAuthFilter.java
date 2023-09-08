@@ -31,27 +31,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain filterChain ) throws ServletException, IOException {
-		// SecurityContext context = SecurityContextHolder.getContext();
-		// String content = request.getHeader( HttpHeaders.AUTHORIZATION );
-		// String username = null;
-		// String token = null;
-		// if( content != null && content.startsWith( "Bearer" ) ) {
-		// 	token = content.substring( 7 );
-		// 	username = this.jwtService.extractUsername( token );
-		// 	if( username != null && context.getAuthentication() == null ) {
-		// 		UserDetails user = this.userDetailsService.loadUserByUsername( username );
-		// 		if( this.jwtService.validateToken( token, user ) ) {
-		// 			System.out.println( "\033[1;32mValid\033[1;38;5;214m: \033[1;38;5;111m" + user.getAuthorities() + "\033[0m\n" );
-		// 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken( user, null, user.getAuthorities() );
-		// 			authenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails( request ) );
-		// 			context.setAuthentication( authenticationToken );
-		// 		}
-		// 		else {
-		// 			System.out.println( "\033[1;31mInvalid\033[1;38;5;214m: \033[1;38;5;111m" + user.getAuthorities() + "\033[0m\n" );
-		// 		}
-		// 	}
-		// }
-
 		SecurityContext context = SecurityContextHolder.getContext();
 		String content = request.getHeader( HttpHeaders.AUTHORIZATION );
 		String username = null;
@@ -84,7 +63,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 				}
 			}
 		}
-			filterChain.doFilter( request, response );
 		filterChain.doFilter( request, response );
 	}
 }

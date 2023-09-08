@@ -14,6 +14,15 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 
+	public UserModel findById( Long id ) {
+		try {
+			return( this.userRepository.findById( id ).get() );
+		}
+		catch( NoSuchElementException e ) {
+			throw new UserNotFoundException( "User not found" );
+		}
+	}
+
 	public UserModel findByUsername( String username ) {
 		try {
 			return( this.userRepository.findByUsername( username ).get() );

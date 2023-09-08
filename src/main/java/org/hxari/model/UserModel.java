@@ -1,12 +1,13 @@
 package org.hxari.model;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.hxari.payload.request.SignInRequest;
-import org.hxari.payload.request.SignUpRequest;
+import org.hxari.payload.request.UserInfoRequest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -20,6 +21,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
@@ -56,6 +59,7 @@ public class UserModel {
 		joinColumns = @JoinColumn( name="user_id" ),
 		inverseJoinColumns = @JoinColumn(name="role_id" )
 	)
+	@JsonIgnore
 	private Set<RoleModel> roles = new HashSet<>();
 
 	@Column( length=32, name="fullname", nullable=false )
@@ -78,38 +82,32 @@ public class UserModel {
 	private Timestamp updated;
 
 	public UserModel() {
-		this.created = this.created != null ? this.created : Timestamp.valueOf( LocalDateTime.now() );
-		this.updated = this.updated != null ? this.updated : Timestamp.valueOf( LocalDateTime.now() );
 	}
 
 	public UserModel( SignInRequest signin ) {
-		this();
 		this.username = signin.username();
 		this.password = signin.password();
 	}
 
 	public UserModel( SignInRequest signin, Set<RoleModel> roles ) {
-		this();
 		this.roles = roles;
 		this.username = signin.username();
 		this.password = signin.password();
 	}
 
-	public UserModel( SignUpRequest signup ) {
-		this();
-		this.fullname = signup.fullname();
-		this.usermail = signup.usermail();
-		this.username = signup.username();
-		this.password = signup.password();
+	public UserModel( UserInfoRequest body ) {
+		this.fullname = body.fullname();
+		this.usermail = body.usermail();
+		this.username = body.username();
+		this.password = body.password();
 	}
 
-	public UserModel( SignUpRequest signup, Set<RoleModel> roles ) {
-		this();
+	public UserModel( UserInfoRequest body, Set<RoleModel> roles ) {
 		this.roles = roles;
-		this.fullname = signup.fullname();
-		this.usermail = signup.usermail();
-		this.username = signup.username();
-		this.password = signup.password();
+		this.fullname = body.fullname();
+		this.usermail = body.usermail();
+		this.username = body.username();
+		this.password = body.password();
 	}
 
 	public Long getId() {
@@ -142,6 +140,17 @@ public class UserModel {
 
 	public Timestamp getUpdated() {
 		return( this.updated );
+	}
+
+	@PrePersist
+	public void onInsert() {
+		this.created = Timestamp.from( ZonedDateTime.now( ZoneId.of( "Asia/Jakarta" ) ).toInstant() );
+		this.updated = this.created;
+	}
+
+	@PreUpdate
+	public void onUpdate() {
+		this.updated = Timestamp.from( ZonedDateTime.now( ZoneId.of( "Asia/Kolkata" ) ).toInstant() );
 	}
 
 	public UserModel setFullname( String fullname ) {

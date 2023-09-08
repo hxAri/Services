@@ -31,19 +31,31 @@ public class JwtService {
 	private UserService userService;
 
 	public String extractUsername( String token ) {
+		if( token.startsWith( "Bearer" ) ) {
+			token = token.substring( 7 );
+		}
 		return( this.extractClaim( token, Claims::getSubject ) );
 	}
 
 	public Date extractExpiration( String token ) {
+		if( token.startsWith( "Bearer" ) ) {
+			token = token.substring( 7 );
+		}
 		return( this.extractClaim( token, Claims::getExpiration ) );
 	}
 
 	public <T> T extractClaim( String token, Function<Claims, T> resolver ) {
+		if( token.startsWith( "Bearer" ) ) {
+			token = token.substring( 7 );
+		}
 		final Claims claims = this.extractAllClaims( token );
 		return( resolver.apply( claims ) );
 	}
 
 	private Claims extractAllClaims( String token ) {
+		if( token.startsWith( "Bearer" ) ) {
+			token = token.substring( 7 );
+		}
 		return( Jwts
 			.parserBuilder()
 			.setSigningKey( this.getSignKey() )
@@ -71,6 +83,9 @@ public class JwtService {
 	}
 
 	public UserModel getUserModel( String token ) {
+		if( token.startsWith( "Bearer" ) ) {
+			token = token.substring( 7 );
+		}
 		return( this.userService.findByUsername( this.extractUsername( token ) ) );
 	}
 
@@ -80,12 +95,20 @@ public class JwtService {
 	}
 
 	private Boolean isTokenExpired( String token ) {
+		if( token.startsWith( "Bearer" ) ) {
+			token = token.substring( 7 );
+		}
 		return( this.extractExpiration( token ).before( new Date() ) );
 	}
 
 	public Boolean validateToken( String token, UserDetails user ) {
-		final String username = extractUsername( token );
-		return( username.equals( user.getUsername() ) && this.isTokenExpired( token ) == false );
+		if( token.startsWith( "Bearer" ) ) {
+			token = token.substring( 7 );
+		}
+		return( 
+			this.extractUsername( token ).equals( user.getUsername() ) && 
+			this.isTokenExpired( token ) == false 
+		);
 	}
 
 }

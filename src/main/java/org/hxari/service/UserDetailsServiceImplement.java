@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hxari.exception.ClientException;
 import org.hxari.model.RoleModel;
 import org.hxari.model.UserModel;
+import org.hxari.payload.request.UserInfoRequest;
 import org.hxari.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -108,6 +110,27 @@ public class UserDetailsServiceImplement implements UserDetailsService {
 			return( new UserDetailsImplement( user.get() ) );
 		}
 		throw new UsernameNotFoundException( String.format( "User %s not found", username ) );
+	}
+
+	public void save( UserModel user, UserInfoRequest body )
+	{
+		if( body.fullname() != null && user.getFullname() != body.fullname() )
+			user.setFullname( body.fullname() );
+		if( body.password() != null && user.getPassword() != body.password() )
+			user.setPassword( this.paswEncoder.encode( body.password() ) );
+		if( body.usermail() != null && user.getUsermail() != body.usermail() ) {
+			if( this.userRepository.existsByUsermail( body.usermail() ) ) {
+				throw new ClientException( "Email Address is already in use" );
+			}
+			user.setUsermail( body.usermail() );
+		}
+		if( body.username() != null && user.getUsername() != body.username() ) {
+			if( this.userRepository.existsByUsername( body.username() ) ) {
+				throw new ClientException( "Username is already exists" );
+			}
+			user.setUsername( body.username() );
+		}
+		this.userRepository.save( user );
 	}
 
 	public void save( UserModel user ) {
