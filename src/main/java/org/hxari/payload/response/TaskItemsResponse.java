@@ -5,7 +5,7 @@ import java.util.List;
 import org.hxari.model.TaskModel;
 
 public record TaskItemsResponse<Tasks>( 
-	int length, 
 	String next, 
+	int length, 
 	List<TaskModel> tasks 
 ) {}

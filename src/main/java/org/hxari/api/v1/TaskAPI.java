@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.hxari.component.PageComponent;
 import org.hxari.exception.ClientException;
+import org.hxari.model.PageModel;
 import org.hxari.model.TaskModel;
 import org.hxari.model.UserModel;
 import org.hxari.payload.request.TaskFetchParameterRequest;
@@ -57,64 +58,71 @@ public class TaskAPI {
 		this.filters = List.of( filter.split( "|" ) );
 	}
 	
-	@Operation(
-		method="POST",
-		summary="API for get tasks",
-		description="API for get task based on filter",
-		parameters={
-			// Integer count, 
-			// String filter,  
-			// Integer offset, 
-			// String next,
-			// String value
-		}
-	)
-	@RequestMapping( method=RequestMethod.POST )
-	public ResponseEntity<BodyResponse<TaskItemsResponse<TaskModel>>> all( HttpServletRequest request, @RequestParam( required=false ) TaskFetchParameterRequest params ) throws Exception {
+	// @Operation(
+	// 	method="POST",
+	// 	summary="API for get tasks",
+	// 	description="API for get task based on filter",
+	// 	parameters={
+	// 		// Integer count, 
+	// 		// String filter,  
+	// 		// Integer offset, 
+	// 		// String next,
+	// 		// String value
+	// 	}
+	// )
+	// @RequestMapping( method=RequestMethod.POST )
+	// public ResponseEntity<BodyResponse<TaskItemsResponse<TaskModel>>> all( HttpServletRequest request, @RequestParam( required=false ) TaskFetchParameterRequest params ) throws Exception {
 		
-		List<TaskModel> tasks = null;
-		Timestamp timestamp = null;
-		Pageable pageable = null;
+	// 	List<TaskModel> tasks = null;
+	// 	Timestamp timestamp = null;
+	// 	Pageable pageable = null;
 
-		if( params == null )
-			params = new TaskFetchParameterRequest( 4, null, 0, null, null );
-		if( params.next() != null ) {
-		}
-		if( params.count() == null ) {
-			params = params.withCount( 4 );
-		}
-		if( params.offset() == null ) {
-			params = params.withOffset( 0 );
-		}
-		if( params.filter() == null ) {
-			params = params.withFilter( this.filters.get( 0 ) );
-		}
-		if( filters.indexOf( params.filter() ) >= 0 ) {
-			UserModel owner = this.getOwner( request, params );
-			switch( params.filter() ) {
-				case "fetchByOwner":
-					tasks = this.taskService.findAllByOwner( owner, pageable );
-					break;
-				case "fetchByCreatedTime":
-					tasks = this.taskService.findAllByOwnerAndCreatedBefore( owner, timestamp, pageable );
-					break;
-				case "fetchByUpdatedTime":
-					tasks = this.taskService.findAllByOwnerAndUpdatedBefore( owner, timestamp, pageable );
-					break;
-				default:
-					throw new ClientException( "Invalid request filter" );
-			}
-			return( new ResponseEntity<>(
-				new BodyResponse<>( "success", "ok", 200,
-					new TaskItemsResponse<>(
-						tasks.size(), null, tasks
-					)
-				), 
-				HttpStatus.OK 
-			));
-		}
-		throw new ClientException( "Invalid request filter" );
-	}
+	// 	if( params == null )
+	// 		params = new TaskFetchParameterRequest( 4, null, 0, null, null );
+	// 	if( params.next() != null ) {
+	// 		PageModel page = pageComponent.find( params.next() );
+	// 		if( page.isNotExpired() ) {
+	// 			switch( page.getFilter() ) {
+	// 			}
+	// 		}
+	// 		else {
+	// 			throw new ClientException( "Next request page is expired" );
+	// 		}
+	// 	}
+	// 	if( params.count() == null ) {
+	// 		params = params.withCount( 4 );
+	// 	}
+	// 	if( params.offset() == null ) {
+	// 		params = params.withOffset( 0 );
+	// 	}
+	// 	if( params.filter() == null ) {
+	// 		params = params.withFilter( this.filters.get( 0 ) );
+	// 	}
+	// 	if( filters.indexOf( params.filter() ) >= 0 ) {
+	// 		UserModel owner = this.getOwner( request, params );
+	// 		switch( params.filter() ) {
+	// 			case "fetchByCreatedTime":
+	// 				tasks = this.taskService.findAllByOwnerAndCreatedBefore( owner, timestamp, pageable );
+	// 				break;
+	// 			case "fetchByUpdatedTime":
+	// 				tasks = this.taskService.findAllByOwnerAndUpdatedBefore( owner, timestamp, pageable );
+	// 				break;
+	// 			case "fetchByOwner":
+	// 			default:
+	// 				tasks = this.taskService.findAllByOwner( owner, pageable );
+	// 				break;
+	// 		}
+	// 		return( new ResponseEntity<>(
+	// 			new BodyResponse<>( "success", "ok", 200,
+	// 				new TaskItemsResponse<>(
+	// 					null, tasks.size(), tasks
+	// 				)
+	// 			), 
+	// 			HttpStatus.OK 
+	// 		));
+	// 	}
+	// 	throw new ClientException( "Invalid request filter" );
+	// }
 
 	@Operation(
 		method="GET",
