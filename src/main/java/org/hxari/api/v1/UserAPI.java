@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -53,7 +54,8 @@ public class UserAPI {
 	@Operation( 
 		method="PUT",
 		summary="API for update user info",
-		description="API for update authenticated user info"
+		description="API for update authenticated user info",
+		parameters={}
 	)
 	@RequestMapping( method=RequestMethod.PUT )
 	@PreAuthorize( value="hasAuthority('ROLE_USER')" )
@@ -67,6 +69,22 @@ public class UserAPI {
 				)
 			),
 			HttpStatus.OK
+		));
+	}
+
+	@Operation(
+		method="DELETE",
+		summary="API for delete user by id",
+		description="API for detele user by id, this just for admin authority only",
+		parameters={}
+	)
+	@RequestMapping( path="/{id}", method=RequestMethod.DELETE )
+	@PreAuthorize( value="hasAuthority('ROLE_ADMIN')" )
+	public ResponseEntity<BodyResponse<Void>> delete( @PathVariable Long id ) {
+		this.userService.delete( id );
+		return( new ResponseEntity<>(
+			new BodyResponse<>( "deleted", "ok", HttpStatus.NO_CONTENT.value(), null ),
+			HttpStatus.NO_CONTENT
 		));
 	}
 }

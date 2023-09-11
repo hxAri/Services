@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import org.hxari.util.DateParserUtil;
+import org.hxari.util.DateUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -29,8 +29,8 @@ public class PageModel
 	@GeneratedValue( strategy=GenerationType.IDENTITY )
 	private Long id;
 
-	@Column( name="offset" )
-	private Integer offset;
+	@Column( name="offsets" )
+	private Integer offsets;
 
 	@Column( name="token", length=128, nullable=false )
 	private String token;
@@ -40,8 +40,17 @@ public class PageModel
 	@JoinColumn( name="owner", nullable=false )
 	private UserModel owner;
 
+	@Column( name="counts", nullable=false )
+	private Integer counts;
+
+	@Column( name="sizes", nullable=false )
+	private Long sizes;
+
 	@Column( name="filter", length=32, nullable=false )
 	private String filter;
+
+	@Column( name="value", length=32, nullable=false )
+	private String values;
 
 	@Column( name="created", nullable=false, updatable=false )
 	private Timestamp created;
@@ -55,18 +64,24 @@ public class PageModel
 	public PageModel() {
 	}
 
-	public PageModel( Integer offset, String token, UserModel owner, String filter ) {
-		this.offset = offset;
+	public PageModel( Integer offsets, Integer counts, Long sizes, String token, UserModel owner, String filter, String values ) {
+		this.offsets = offsets;
+		this.counts = counts;
+		this.sizes = sizes;
 		this.token = token;
 		this.owner = owner;
 		this.filter = filter;
+		this.values = values;
 	}
 
-	public PageModel( Integer offset, String token, UserModel owner, String filter, Timestamp expires ) {
-		this.offset = offset;
+	public PageModel( Integer offsets, Integer counts, Long sizes, String token, UserModel owner, String filter, String values, Timestamp expires ) {
+		this.offsets = offsets;
+		this.counts = counts;
+		this.sizes = sizes;
 		this.token = token;
 		this.owner = owner;
 		this.filter = filter;
+		this.values = values;
 		this.expires = expires;
 	}
 
@@ -74,8 +89,16 @@ public class PageModel
 		return( this.id );
 	}
 
+	public Integer getCounts() {
+		return( this.counts );
+	}
+
 	public Integer getOffset() {
-		return( this.offset );
+		return( this.offsets );
+	}
+
+	public Long getSizes() {
+		return( this.sizes );
 	}
 
 	public String getToken() {
@@ -90,6 +113,10 @@ public class PageModel
 		return( this.owner );
 	}
 
+	public String getValue() {
+		return( this.values );
+	}
+
 	public Timestamp getCreated() {
 		return( this.created );
 	}
@@ -100,6 +127,19 @@ public class PageModel
 
 	public Timestamp getUpdated() {
 		return( this.updated );
+	}
+
+	public boolean isExpired() {
+		return( ( this.expires.getTime() / 1000 ) <= ( Timestamp.from( ZonedDateTime.now( ZoneId.of( "Asia/Jakarta" ) ).toInstant() ).getTime() / 1000 ) );
+	}
+
+	public boolean isExpired( boolean optional ) {
+		return( this.isExpired() == optional );
+	}
+
+	@JsonIgnore
+	public boolean isNotExpired() {
+		return( this.isExpired( false ) );
 	}
 
 	@PrePersist
@@ -113,13 +153,28 @@ public class PageModel
 		this.updated = Timestamp.from( ZonedDateTime.now( ZoneId.of( "Asia/Kolkata" ) ).toInstant() );
 	}
 
-	public PageModel setOffset( Integer offset ) {
-		this.offset = offset;
+	public PageModel setCounts( Integer counts ) {
+		this.counts = counts;
+		return( this );
+	}
+
+	public PageModel setOffset( Integer offsets ) {
+		this.offsets = offsets;
+		return( this );
+	}
+
+	public PageModel setSizes( Long sizes ) {
+		this.sizes = sizes;
 		return( this );
 	}
 
 	public PageModel setToken( String token ) {
 		this.token = token;
+		return( this );
+	}
+
+	public PageModel setValue( String values ) {
+		this.values = values;
 		return( this );
 	}
 
@@ -134,7 +189,7 @@ public class PageModel
 	}
 
 	public PageModel setExpires( String expires ) {
-		return( this.setExpires( DateParserUtil.localDateTime( expires ) ) );
+		return( this.setExpires( DateUtil.parse( expires ) ) );
 	}
 
 	public PageModel setExpires( LocalDateTime expires ) {

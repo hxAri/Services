@@ -23,6 +23,30 @@ public class TaskService {
 	@Autowired
 	private TaskPageableRepository taskPageableRepository;
 
+	public Long count() {
+		return( this.taskRepository.count() );
+	}
+
+	public Long countByOwnerAndCreatedAfter( UserModel owner, Timestamp created ) {
+		return( this.taskRepository.countByOwnerAndCreatedAfter( owner, created ) );
+	}
+
+	public Long countByOwnerAndCreatedAfterAndCreatedBefore( UserModel owner, Timestamp created, Timestamp before ) {
+		return( this.taskRepository.countByOwnerAndCreatedAfterAndCreatedBefore( owner, created, before ) );
+	}
+
+	public Long countByOwnerAndUpdatedAfter( UserModel owner, Timestamp updated ) {
+		return( this.countByOwnerAndUpdatedAfter( owner, updated ) );
+	}
+
+	public Long countByOwnerAndUpdatedAfterAndUpdatedBefore( UserModel owner, Timestamp updated, Timestamp before ) {
+		return( this.taskRepository.countByOwnerAndUpdatedAfterAndUpdatedBefore( owner, updated, before ) );
+	}
+	
+	public Long countByOwner( UserModel owner ) {
+		return( this.taskRepository.countByOwner( owner ) );
+	}
+
 	public void delete( Long id ) {
 		this.taskRepository.deleteById( id );
 	}
@@ -36,12 +60,22 @@ public class TaskService {
 		}
 	}
 	
-	public List<TaskModel> findAllByOwnerAndCreatedBefore( UserModel owner, Timestamp created, Pageable pageable ) {
-		return( this.taskPageableRepository.findAllByOwnerAndCreatedBefore( owner, created, pageable ).get() );
+	public List<TaskModel> findAllByOwnerAndCreatedAfter( UserModel owner, Timestamp created, Pageable pageable ) {
+		return( this.taskPageableRepository.findAllByOwnerAndCreatedAfter( owner, created, pageable ).get() );
 	}
-	public List<TaskModel> findAllByOwnerAndUpdatedBefore( UserModel owner, Timestamp updated, Pageable pageable ) {
-		return( this.taskPageableRepository.findAllByOwnerAndUpdatedBefore( owner, updated, pageable ).get() );
+
+	public List<TaskModel> findAllByOwnerAndCreatedAfterAndCreatedBefore( UserModel owner, Timestamp created, Timestamp before, Pageable pageable ) {
+		return( this.taskPageableRepository.findAllByOwnerAndCreatedAfterAndCreatedBefore( owner, created, before, pageable ).get() );
 	}
+
+	public List<TaskModel> findAllByOwnerAndUpdatedAfter( UserModel owner, Timestamp updated, Pageable pageable ) {
+		return( this.taskPageableRepository.findAllByOwnerAndUpdatedAfter( owner, updated, pageable ).get() );
+	}
+
+	public List<TaskModel> findAllByOwnerAndUpdatedAfterAndUpdatedBefore( UserModel owner, Timestamp updated, Timestamp before, Pageable pageable ) {
+		return( this.taskPageableRepository.findAllByOwnerAndUpdatedAfterAndUpdatedBefore( owner, updated, before, pageable ).get() );
+	}
+
 	public List<TaskModel> findAllByOwner( UserModel owner, Pageable pageable ) {
 		return( this.taskPageableRepository.findAllByOwner( owner, pageable ).get() );
 	}

@@ -55,6 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 							UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken( user, null, user.getAuthorities() );
 							authenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails( request ) );
 							context.setAuthentication( authenticationToken );
+							response.setHeader( HttpHeaders.AUTHORIZATION, String.format( "Bearer %s", token ) );
 						}
 						else {
 							System.out.println( "\033[1;31mInvalid\033[1;38;5;214m: \033[1;38;5;111m" + user.getAuthorities() + "\033[0m\n" );

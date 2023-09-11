@@ -1,11 +1,58 @@
 package org.hxari.util;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
-public class DateParserUtil
+public class DateUtil
 {
+
+	public static LocalDateTime newYearAfter( String format ) {
+		return( DateUtil.newYearAfter( DateUtil.parse( format ) ) );
+	}
+
+	public static LocalDateTime newYearAfter( LocalDateTime from ) {
+		int year = from.getYear();
+		int month = from.getMonthValue();
+		int days = from.getDayOfMonth();
+		int hour = from.getHour();
+		int minute = from.getMinute();
+		LocalDateTime now = LocalDateTime.now( ZoneId.of( "Asia/Jakarta" ) );
+		if( year <= now.getYear() ) {
+			if( year < now.getYear() ) year++;
+			if( month == 12 ) {
+				minute = 0;
+				month = 1;
+				hour = 1;
+				days = 1;
+				year++;
+			}
+			else {
+				if( days == 30 ) {
+					days = 1;
+				}
+				else {
+					days++;
+				}
+				if( hour == 23 ) {
+					hour = 0;
+					minute = 0;
+				}
+				else {
+					if( minute == 59 ) {
+						minute = 0;
+					}
+					else {
+						minute++;
+					}
+					hour++;
+				}
+				month++;
+			}
+		}
+		return( LocalDateTime.of( year, month, days, hour, minute ).atZone( ZoneId.of( "Asia/Jakarta" ) ).toLocalDateTime() );
+	}
 
 	/*
 	 * Parse datetime format.
@@ -20,7 +67,7 @@ public class DateParserUtil
 	 *  When the datetime format is invalid or
 	 *  Unsupported unit time.
 	 */
-	public static LocalDateTime localDateTime( String format )
+	public static LocalDateTime parse( String format )
 	{
 		// Removing spaces in first and end of text.
 		format = format.trim();
@@ -28,7 +75,7 @@ public class DateParserUtil
 		// Try parsing as a valid LocalDateTime
 		try
 		{
-            return( LocalDateTime.parse( format ) );
+            return( LocalDateTime.parse( format ).atZone( ZoneId.of( "Asia/Jakarta" ) ).toLocalDateTime() );
         }
 		catch( DateTimeParseException e )
 		{
@@ -43,8 +90,8 @@ public class DateParserUtil
 					.replace( "-", "" )
 				);
 				String unit = parts[1].toLowerCase();
-				LocalDateTime now = LocalDateTime.now();
-				ChronoUnit chrono = getChronoUnit( unit );
+				LocalDateTime now = LocalDateTime.now().atZone( ZoneId.of( "Asia/Jakarta" ) ).toLocalDateTime();
+				ChronoUnit chrono = DateUtil.getChronoUnit( unit );
 
 				// If the amount is started with minus symbol.
 				if( parts[0].startsWith( "-" ) )

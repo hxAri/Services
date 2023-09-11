@@ -24,10 +24,10 @@ public class TaskModel {
 	@GeneratedValue( strategy=GenerationType.IDENTITY )
 	private Long id;
 
-	@Column( length=32, name="title", nullable=false )
+	@Column( length=64, name="title", nullable=false )
 	private String title;
 
-	@ManyToOne( fetch=FetchType.LAZY )
+	@ManyToOne( fetch=FetchType.EAGER )
 	@JoinColumn( name="owner", nullable=false )
 	private UserModel owner;
 

@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping( path="/api/v1/auth" )
@@ -49,7 +50,7 @@ public class AuthAPI {
 	@Autowired
 	private UserRepository userRepository;
 
-	private ResponseEntity<BodyResponse<AuthResponse<UserDetails, String>>> builder( String username, String password ) throws AuthenticationException {
+	private ResponseEntity<BodyResponse<AuthResponse<UserDetails/**, String*/>>> builder( HttpServletResponse response, String username, String password ) throws AuthenticationException {
 		Authentication authentication = this.authenticationManager.authenticate(
 			new UsernamePasswordAuthenticationToken(
 				username, password
@@ -57,11 +58,11 @@ public class AuthAPI {
 		);
 		if( authentication.isAuthenticated() ) {
 			UserDetails user = this.userDetailsService.loadUserByUsername( username );
+			String token = this.jwtService.generateToken( username );
+			response.setHeader( HttpHeaders.AUTHORIZATION, String.format( "Bearer %s", token ) );
 			return( new ResponseEntity<>(
 				new BodyResponse<>( "success", "ok", 200,
-					new AuthResponse<>(
-						user, this.jwtService.generateToken( username )
-					)
+					new AuthResponse<>( user )
 				), 
 				HttpStatus.OK
 			));
@@ -100,11 +101,12 @@ public class AuthAPI {
 	@Operation(
 		method="POST",
 		summary="SignIn for authenticate request",
-		description="SignIn for authenticate request based on role"
+		description="SignIn for authenticate request based on role",
+		parameters={}
 	)
 	@RequestMapping( path="/signin", method=RequestMethod.POST )
-	public ResponseEntity<BodyResponse<AuthResponse<UserDetails, String>>> signin( @RequestBody( required=true ) SignInRequest body ) throws AuthenticationException {
-		return( this.builder(
+	public ResponseEntity<BodyResponse<AuthResponse<UserDetails/**, String*/>>> signin( @RequestBody( required=true ) SignInRequest body, HttpServletResponse response ) throws AuthenticationException {
+		return( this.builder( response,
 			body.username(), 
 			body.password()
 		));
@@ -113,16 +115,17 @@ public class AuthAPI {
 	@Operation(
 		method="POST",
 		summary="Register new user",
-		description="Register new role user"
+		description="Register new role user",
+		parameters={}
 	)
 	@RequestMapping( path="/signup", method=RequestMethod.POST )
-	public ResponseEntity<BodyResponse<AuthResponse<UserDetails, String>>> signup( @RequestBody( required=true ) UserInfoRequest body ) throws AuthenticationException {
+	public ResponseEntity<BodyResponse<AuthResponse<UserDetails/**, String*/>>> signup( @RequestBody( required=true ) UserInfoRequest body, HttpServletResponse response ) throws AuthenticationException {
 		if( this.userRepository.existsByUsermail( body.usermail() ) )
 			throw new ClientException( "Email Address is already use" );
 		if( this.userRepository.existsByUsername( body.username() ) )
 			throw new ClientException( "Username is already use" );
 		this.userDetailsService.save( new UserModel( body, Set.of( new RoleModel( Role.USER ) ) ) );
-		return( this.builder(
+		return( this.builder( response,
 			body.username(), 
 			body.password()
 		));

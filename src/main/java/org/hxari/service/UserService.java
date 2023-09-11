@@ -14,6 +14,14 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 
+	public void delete( Long id ) {
+		this.userRepository.deleteById( id );
+	}
+
+	public void delete( UserModel user ) {
+		this.userRepository.delete( user );
+	}
+
 	public UserModel findById( Long id ) {
 		try {
 			return( this.userRepository.findById( id ).get() );

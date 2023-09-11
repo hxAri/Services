@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 import org.hxari.exception.ClientException;
 import org.hxari.model.PageModel;
 import org.hxari.repository.PageRepository;
-import org.hxari.util.DateParserUtil;
+import org.hxari.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -62,7 +62,7 @@ public class PageComponent
 	 */
 	public void save( PageModel page ) throws Exception {
 		if( page.getExpires() == null ) {
-			page.setExpires( DateParserUtil.localDateTime( this.EXPIRES ) );
+			page.setExpires( DateUtil.parse( this.EXPIRES ) );
 		}
 		this.pageRepository.save( page );
 	}

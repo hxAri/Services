@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TaskPageableRepository extends PagingAndSortingRepository<TaskModel, Long> {
-	Optional<List<TaskModel>> findAllByOwnerAndCreatedBefore( UserModel owner, Timestamp created, Pageable pageable );
-	Optional<List<TaskModel>> findAllByOwnerAndUpdatedBefore( UserModel owner, Timestamp updated, Pageable pageable );
+	Optional<List<TaskModel>> findAllByOwnerAndCreatedAfter( UserModel owner, Timestamp created, Pageable pageable );
+	Optional<List<TaskModel>> findAllByOwnerAndCreatedAfterAndCreatedBefore( UserModel owner, Timestamp created, Timestamp before, Pageable pageable );
+	Optional<List<TaskModel>> findAllByOwnerAndUpdatedAfter( UserModel owner, Timestamp updated, Pageable pageable );
+	Optional<List<TaskModel>> findAllByOwnerAndUpdatedAfterAndUpdatedBefore( UserModel owner, Timestamp updated, Timestamp before, Pageable pageable );
 	Optional<List<TaskModel>> findAllByOwner( UserModel owner, Pageable pageable );
 }
