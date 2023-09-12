@@ -43,6 +43,7 @@ public class ErrorAPI {
 		HttpStatus status = null;
 		switch( e.getClass().getSimpleName() ) {
 			case "AuthenticationException":
+			case "ExpiredJwtException":
 				status = HttpStatus.UNAUTHORIZED;
 				break;
 			case "ForbidenRequestException":
