@@ -1,0 +1,71 @@
+{
+    "mappings": {
+        "properties": {
+            "brand": {
+                "type": "keyword"
+            },
+            "category": {
+                "type": "keyword"
+            },
+            "datetime": {
+                "type": "date",
+                "format": "yyyy-MM-dd'T'HH:mm:ss"
+            },
+            "description": {
+                "type": "text"
+            },
+            "features": {
+                "properties": {
+                    "aloe_vera_type": {
+                        "type": "keyword"
+                    },
+                    "size": {
+                        "type": "keyword"
+                    },
+                    "certification": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "id": {
+                "type": "keyword"
+            },
+            "name": {
+                "type": "text"
+            },
+            "owner": {
+                "type": "keyword"
+            },
+            "pay": {
+                "properties": {
+                    "method": {
+                        "type": "keyword"
+                    },
+                    "currency": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "price": {
+                "type": "double"
+            },
+            "quantity": {
+                "type": "integer"
+            },
+            "ratings": {
+                "type": "nested",
+                "properties": {
+                    "description": {
+                        "type": "text"
+                    },
+                    "rating": {
+                        "type": "double"
+                    },
+                    "user": {
+						"type": "keyword"
+                    }
+                }
+            }
+        }
+    }
+}

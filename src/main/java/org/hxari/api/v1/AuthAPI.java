@@ -1,20 +1,20 @@
 package org.hxari.api.v1;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.Set;
 
 import org.hxari.exception.AuthenticationException;
-import org.hxari.exception.ClientException;
-import org.hxari.model.RoleModel;
 import org.hxari.model.UserModel;
-import org.hxari.model.UserModel.Role;
+import org.hxari.model.RoleModel.Role;
 import org.hxari.payload.request.SignInRequest;
 import org.hxari.payload.request.UserInfoRequest;
 import org.hxari.payload.response.AuthInfoResponse;
 import org.hxari.payload.response.AuthResponse;
 import org.hxari.payload.response.BodyResponse;
-import org.hxari.repository.UserRepository;
 import org.hxari.service.JwtService;
-import org.hxari.service.UserDetailsServiceImplement;
+import org.hxari.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,16 +46,14 @@ public class AuthAPI {
 	private JwtService jwtService;
 
 	@Autowired
-	private UserDetailsServiceImplement userDetailsService;
+	private UserDetailsService userDetailsService;
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserService userService;
 
 	private ResponseEntity<BodyResponse<AuthResponse<UserDetails/**, String*/>>> builder( HttpServletResponse response, String username, String password ) throws AuthenticationException {
 		Authentication authentication = this.authenticationManager.authenticate(
-			new UsernamePasswordAuthenticationToken(
-				username, password
-			)
+			new UsernamePasswordAuthenticationToken( username, password )
 		);
 		if( authentication.isAuthenticated() ) {
 			UserDetails user = this.userDetailsService.loadUserByUsername( username );
@@ -119,12 +118,9 @@ public class AuthAPI {
 		parameters={}
 	)
 	@RequestMapping( path="/signup", method=RequestMethod.POST )
-	public ResponseEntity<BodyResponse<AuthResponse<UserDetails/**, String*/>>> signup( @RequestBody( required=true ) UserInfoRequest body, HttpServletResponse response ) throws AuthenticationException {
-		if( this.userRepository.existsByUsermail( body.usermail() ) )
-			throw new ClientException( "Email Address is already use" );
-		if( this.userRepository.existsByUsername( body.username() ) )
-			throw new ClientException( "Username is already use" );
-		this.userDetailsService.save( new UserModel( body, Set.of( new RoleModel( Role.USER ) ) ) );
+	public ResponseEntity<BodyResponse<AuthResponse<UserDetails/**, String*/>>> signup( @RequestBody( required=true ) UserInfoRequest body, HttpServletResponse response ) throws AuthenticationException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+		this.userService.create( new UserModel( Set.of( Role.USER ), body ) );
+		this.userDetailsService.loadUserByUsername( body.username() );
 		return( this.builder( response,
 			body.username(), 
 			body.password()

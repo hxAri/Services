@@ -1,0 +1,279 @@
+[
+    {
+        "airport": {
+            "name": "Bandara Narita",
+            "location": [
+                35.771986,
+                140.39285
+            ]
+        },
+        "datetime": {
+            "start": "2023-10-15",
+            "finish": "2023-10-25"
+        },
+        "destination": {
+            "name": "Tokyo",
+            "country": "Japan",
+            "location": [
+                35.682839,
+                139.759455
+            ]
+        },
+        "id": "e16EfCuoA1xrY",
+        "itinerary": [
+            {
+                "id": "1",
+                "target": "Tokyo Tower",
+                "datetime": {
+                    "start": "2023-10-16T10:00:00",
+                    "finish": "2023-10-16T13:00:00"
+                },
+                "location": [
+					35.682839,
+					139.759455
+				]
+            },
+            {
+                "id": "2",
+                "target": "Tokyo National Museum of Art",
+                "datetime": {
+                    "start": "2023-10-17T14:00:00",
+                    "finish": "2023-10-17T17:00:00"
+                },
+                "location": [
+					35.682839,
+					139.759455
+				]
+            },
+            {
+                "id": "3",
+                "target": "Oedo Onsen Monogatari Hot Springs",
+                "datetime": {
+                    "start": "2023-10-19T18:00:00",
+                    "finish": "2023-10-19T21:00:00"
+                },
+                "location": {
+                    "lat": 35.61315,
+                    "lon": 139.756751
+                }
+            }
+        ],
+        "trip_name": "Tokyo"
+    },
+    {
+        "airport": {
+            "name": "Bandara Kansai",
+            "location": [
+                34.434722,
+                135.235833
+            ]
+        },
+        "datetime": {
+            "start": "2023-08-15",
+            "finish": "2023-08-22"
+        },
+        "destination": {
+            "name": "Osaka",
+            "country": "Japan",
+            "location": [
+                34.693738,
+                135.502165
+            ]
+        },
+        "id": "b8kxEM1hy8x0U",
+        "itinerary": [],
+        "trip_name": "Osaka"
+    },
+    {
+        "airport": {
+            "name": "Bandara Naha",
+            "location": [
+                26.205509,
+                127.648468
+            ]
+        },
+        "datetime": {
+            "start": "2023-07-20",
+            "finish": "2023-07-30"
+        },
+        "destination": {
+            "name": "Okinawa",
+            "country": "Japan",
+            "location": [
+                26.334427,
+                127.805583
+            ]
+        },
+        "id": "f9dSCnkfrtBnM",
+        "itinerary": [],
+        "trip_name": "Okinawa"
+    },
+    {
+        "airport": {
+            "name": "Bandara Kansai",
+            "location": [
+                34.434722,
+                135.235833
+            ]
+        },
+        "datetime": {
+            "start": "2023-11-05",
+            "finish": "2023-11-12"
+        },
+        "destination": {
+            "name": "Kyoto",
+            "country": "Japan",
+            "location": [
+                35.0116,
+                135.7681
+            ]
+        },
+        "id": "faFw0HWdTRJA6",
+        "itinerary": [],
+        "trip_name": "Kyoto"
+    },
+    {
+        "airport": {
+            "name": "Bandara Chitose",
+            "location": [
+                42.7752,
+                141.6926
+            ]
+        },
+        "datetime": {
+            "start": "2023-12-10",
+            "finish": "2023-12-20"
+        },
+        "destination": {
+            "name": "Sapporo",
+            "country": "Japan",
+            "location": [
+                43.0618,
+                141.3545
+            ]
+        },
+        "id": "ffqYyhPnNGu96",
+        "itinerary": [],
+        "trip_name": "Sapporo"
+    },
+    {
+        "airport": {
+            "name": "Bandara Shin-Chitose",
+            "location": [
+                42.7752,
+                141.6926
+            ]
+        },
+        "datetime": {
+            "start": "2023-12-01",
+            "finish": "2023-12-10"
+        },
+        "destination": {
+            "name": "Hokkaido",
+            "country": "Japan",
+            "location": [
+                43.2203,
+                142.8635
+            ]
+        },
+        "id": "a84mQDvBuCjuY",
+        "itinerary": [],
+        "trip_name": "Hokkaido"
+    },
+    {
+        "airport": {
+            "name": "Bandara Hiroshima",
+            "location": [
+                34.4372,
+                132.9214
+            ]
+        },
+        "datetime": {
+            "start": "2023-11-15",
+            "finish": "2023-11-22"
+        },
+        "destination": {
+            "name": "Hiroshima",
+            "country": "Japan",
+            "location": [
+                34.3853,
+                132.4553
+            ]
+        },
+        "id": "fbSgEgwCXQO56",
+        "itinerary": [],
+        "trip_name": "Hiroshima"
+    },
+    {
+        "airport": {
+            "name": "Bandara Chubu Centrair",
+            "location": [
+                34.8583,
+                136.8042
+            ]
+        },
+        "datetime": {
+            "start": "2023-10-20",
+            "finish": "2023-10-28"
+        },
+        "destination": {
+            "name": "Nagoya",
+            "country": "Japan",
+            "location": [
+                35.1815,
+                136.9066
+            ]
+        },
+        "id": "c30yX7UjmRxTk",
+        "itinerary": [],
+        "trip_name": "Nagoya"
+    },
+    {
+        "airport": {
+            "name": "Bandara Fukuoka",
+            "location": [
+                33.5851,
+                130.4506
+            ]
+        },
+        "datetime": {
+            "start": "2023-09-15",
+            "finish": "2023-09-25"
+        },
+        "destination": {
+            "name": "Fukuoka",
+            "country": "Japan",
+            "location": [
+                33.5904,
+                130.4017
+            ]
+        },
+        "id": "e3mDz6zkdOtFQ",
+        "itinerary": [],
+        "trip_name": "Fukuoka"
+    },
+    {
+        "airport": {
+            "name": "Bandara Kansai",
+            "location": [
+                34.4347,
+                135.2358
+            ]
+        },
+        "datetime": {
+            "start": "2023-11-25",
+            "finish": "2023-11-30"
+        },
+        "destination": {
+            "name": "Nara",
+            "country": "Japan",
+            "location": [
+                34.6851,
+                135.8048
+            ]
+        },
+        "id": "fcVf01hoP4RBk",
+        "itinerary": [],
+        "trip_name": "Nara"
+    }
+]

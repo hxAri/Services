@@ -1,3 +1,4 @@
+
 package org.hxari.util;
 
 import java.security.NoSuchAlgorithmException;

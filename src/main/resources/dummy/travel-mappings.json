@@ -1,0 +1,73 @@
+{
+    "mappings": {
+        "properties": {
+            "airport": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "location": {
+                        "type": "geo_point"
+                    }
+                }
+            },
+            "datetime": {
+                "properties": {
+                    "start": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd"
+                    },
+                    "finish": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd"
+                    }
+                }
+            },
+            "destination": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "country": {
+                        "type": "text"
+                    },
+                    "location": {
+                        "type": "geo_point"
+                    }
+                }
+            },
+            "id": {
+                "type": "keyword"
+            },
+            "itinerary": {
+                "type": "nested",
+                "properties": {
+                    "id": {
+                        "type": "keyword"
+                    },
+                    "target": {
+                        "type": "text"
+                    },
+                    "datetime": {
+                        "properties": {
+                            "start": {
+                                "type": "date",
+                                "format": "yyyy-MM-dd'T'HH:mm:ss"
+                            },
+                            "finish": {
+                                "type": "date",
+                                "format": "yyyy-MM-dd'T'HH:mm:ss"
+                            }
+                        }
+                    },
+                    "location": {
+                        "type": "geo_point"
+                    }
+                }
+            },
+            "trip_name": {
+                "type": "text"
+            }
+        }
+    }
+}

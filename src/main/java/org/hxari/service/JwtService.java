@@ -1,5 +1,6 @@
 package org.hxari.service;
 
+import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.hxari.model.UserModel;
+import org.hxari.payload.hit.ElasticHit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,10 +23,10 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-	@Value( "${jwt.expirationMs}" )
+	@Value( "${service.jwt.expirationMs}" )
 	protected int EXPIRATION_MS;
 	
-	@Value( "${jwt.secret}" )
+	@Value( "${service.jwt.secret}" )
 	protected String SECRET;
 
 	@Autowired
@@ -67,6 +69,7 @@ public class JwtService {
 
 	public String generateToken( String username ) {
 		Map<String, Object> claims = new HashMap<>();
+		claims.put( "username", username );
 		return( this.generateClaimsToken( username, claims ) );
 	}
 
@@ -82,11 +85,11 @@ public class JwtService {
 		);
 	}
 
-	public UserModel getUserModel( String token ) {
+	public ElasticHit<UserModel> getUser( String token ) throws IOException {
 		if( token.startsWith( "Bearer" ) ) {
 			token = token.substring( 7 );
 		}
-		return( this.userService.findByUsername( this.extractUsername( token ) ) );
+		return( this.userService.getByUsername( this.extractUsername( token ) ) );
 	}
 
 	private Key getSignKey() {

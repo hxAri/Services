@@ -1,52 +1,28 @@
 package org.hxari.model;
 
-import org.hxari.model.UserModel.Role;
+public record RoleModel( String name ) {
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+	public enum Role {
 
-@Entity
-@Table( name="roles" )
-public class RoleModel {
+		ROOT( "ROLE_ROOT" ),
+		USER( "ROLE_USER" );
 
-    @Id
-    @Column( name="id" )
-    @GeneratedValue( strategy=GenerationType.IDENTITY )
-    private Long id;
-    
-	@Column( length=24, name="role" )
-    private String role;
-	
-	public RoleModel() {
+		private String value;
+
+		private Role( String value ) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return( this.value );
+		}
+
+		public String value() {
+			return( this.value );
+		}
 	}
 
-	public RoleModel( Role role ) {
-		this.setRole( role );
-	}
-
-	public RoleModel( String role ) {
-		this.setRole( role );
-	}
-
-    public Long getId() {
-        return( this.id );
-    }
-
-	public String getRole() {
-		return( this.role );
-	}
-
-	public RoleModel setRole( Role role ) {
-		return( this.setRole( role.value() ) );
-	}
-
-	public RoleModel setRole( String role ) {
-		this.role = role;
-		return( this );
+	public RoleModel withName( String name ) {
+		return new RoleModel( name );
 	}
 }
-

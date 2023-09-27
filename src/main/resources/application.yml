@@ -1,0 +1,59 @@
+
+# Logging Properties
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+
+# Application Server Properties.
+server:
+  port: 8004
+  error:
+    include-message: always
+
+# Spring Properties.
+spring:
+  elasticsearch:
+    host: http://192.168.20.90:9200
+    port: 9200
+  main:
+    allow-circular-references: true
+  security:
+    filter:
+      order: 10
+    password:
+      cost: 12
+    user:
+      name: hxAri
+      roles: ADMIN
+      password: NzZkMTRmZjdhZTdlMTBjNjY5ODhjMjBlMDY2MzIwYmUzMGZhMjZkNzkyY2U1NzBiOGE1NGY4N2QxZTU5OTBlOA
+
+# Spring Documentation Properties.
+springdoc:
+  cache:
+    disabled: true
+  swagger-ui:
+    enabled: true
+    disable-swagger-default-url: true
+    path: /docs
+
+# Application Service Properties.
+service:
+  elastic:
+    cluster:
+      name: ES_Latihan
+      uuid: NjtwiFTBQXqmwDvPz-1Z_A
+    host: http://192.168.20.90:9200
+    index:
+      shop: learn-shop
+      user: learn-user
+  fetch:
+    # filter:
+      # task: fetchByOwner|fetchByCreatedTime|fetchByUpdatedTime
+    limit:
+      count: 50
+    next:
+      page-expires: +20 minutes
+  jwt:
+    secret: 2150e831e635aba83d2326f4501425fe441211af18209d35ac8668df1dc51c72e9a93220b29b09058e2640600e8dcd6aadd1aeeea9c08d82e9a201efba5aef4d7325a3bf4e349ec58e23b316bc6a8cbf7e3edd18df2066a9621336884861e68d5bdf40eb14c072febbbca891e8c85bb9ec40abeca611206d75874227f3e8d16bbe4342b52ce043b2c2e83c2c5b872583c40beaac775180d00f99a1515b0a524d639144a6f510ee8eddcdda58170771cc257110627a6922ee84e9c823e4d23f72fdef78ef75b18600b9fc12fab4b9e4e8ae9a861e014d817b8c86c216915ef40e36bd950937b49af427c4cfcb601f9cffe2a44f262316f8a02f736ed36e84a4d3d301
+    expirationMs: 86400000

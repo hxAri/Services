@@ -1,23 +1,22 @@
 package org.hxari.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
-import org.hxari.exception.ClientException;
-import org.hxari.model.RoleModel;
+import org.hxari.exception.ServiceException;
+import org.hxari.exception.UserNotFoundException;
+import org.hxari.model.RoleModel.Role;
 import org.hxari.model.UserModel;
-import org.hxari.payload.request.UserInfoRequest;
-import org.hxari.repository.UserRepository;
+import org.hxari.payload.hit.ElasticHit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,36 +25,48 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class UserDetailsServiceImplement implements UserDetailsService {
 
 	@Autowired
-	private PasswordEncoder paswEncoder;
+	private UserService userService;
 
-	@Autowired
-	private UserRepository userRepository;
+	@Override
+	public UserDetails loadUserByUsername( String username ) {
+		try {
+			return new UserDetailsImplement( this.userService.getByUsername( username ) );
+		}
+		catch( IOException e ) {
+			throw new ServiceException( "Something wrong when getting user info" );
+		}
+		catch( UserNotFoundException e ) {
+			throw new UsernameNotFoundException( String.format( "User %s not found", username ), e );
+		}
+	}
 
 	public class UserDetailsImplement implements UserDetails {
 
-		private Long id;
+		private String id;
 		private String fullname;
 		private String usermail;
 		private String username;
+
 		@JsonIgnore
 		private String password;
-		private Set<RoleModel> roles;
 		
-		public UserDetailsImplement( UserModel user ) {
-			this.id = user.getId();
-			this.roles = user.getRoles();
-			this.fullname = user.getFullname();
-			this.usermail = user.getUsermail();
-			this.username = user.getUsername();
-			this.password = user.getPassword();
+		private Set<Role> roles;
+		
+		public UserDetailsImplement( ElasticHit<UserModel> hit ) {
+			this.id = hit.id();
+			this.roles = hit.source().getRoles();
+			this.fullname = hit.source().getFullname();
+			this.usermail = hit.source().getUsermail();
+			this.username = hit.source().getUsername();
+			this.password = hit.source().getPassword();
 		}
 
 		@Override
 		public Collection<? extends GrantedAuthority> getAuthorities() {
-        	Set<RoleModel> roles = this.roles;
+        	Set<Role> roles = this.roles;
 			List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-			for( RoleModel role : roles ) {
-				authorities.add( new SimpleGrantedAuthority( role.getRole() ) );
+			for( Role role : roles ) {
+				authorities.add( new SimpleGrantedAuthority( role.value() ) );
 			}
 			return( authorities );
 		}
@@ -64,7 +75,7 @@ public class UserDetailsServiceImplement implements UserDetailsService {
 			return( this.fullname );
 		}
 
-		public Long getId() {
+		public String getId() {
 			return( this.id );
 		}
 
@@ -102,40 +113,5 @@ public class UserDetailsServiceImplement implements UserDetailsService {
 			return( true );
 		}
 	}
-	
-	@Override
-	public UserDetails loadUserByUsername( String username ) throws UsernameNotFoundException {
-		Optional<UserModel> user = this.userRepository.findByUsername( username );
-		if( user.isPresent() ) {
-			return( new UserDetailsImplement( user.get() ) );
-		}
-		throw new UsernameNotFoundException( String.format( "User %s not found", username ) );
-	}
-
-	public void save( UserModel user, UserInfoRequest body )
-	{
-		if( body.fullname() != null && user.getFullname() != body.fullname() )
-			user.setFullname( body.fullname() );
-		if( body.password() != null && user.getPassword() != body.password() )
-			user.setPassword( this.paswEncoder.encode( body.password() ) );
-		if( body.usermail() != null && user.getUsermail() != body.usermail() ) {
-			if( this.userRepository.existsByUsermail( body.usermail() ) ) {
-				throw new ClientException( "Email Address is already in use" );
-			}
-			user.setUsermail( body.usermail() );
-		}
-		if( body.username() != null && user.getUsername() != body.username() ) {
-			if( this.userRepository.existsByUsername( body.username() ) ) {
-				throw new ClientException( "Username is already exists" );
-			}
-			user.setUsername( body.username() );
-		}
-		this.userRepository.save( user );
-	}
-
-	public void save( UserModel user ) {
-        user.setPassword( this.paswEncoder.encode( user.getPassword() ) );
-        this.userRepository.save( user );
-    }
 	
 }

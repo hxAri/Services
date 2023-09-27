@@ -1,6 +1,6 @@
 package org.hxari.exception;
 
-public class TaskNotFoundException extends ClientException
+public class ProductNotFoundException extends ClientException
 {
 	
 	/*
@@ -10,7 +10,7 @@ public class TaskNotFoundException extends ClientException
 	 * 
 	 * @return Void
 	 */
-	public TaskNotFoundException()
+	public ProductNotFoundException()
 	{}
 
 	/*
@@ -20,7 +20,7 @@ public class TaskNotFoundException extends ClientException
 	 * 
 	 * @return Void
 	 */
-	public TaskNotFoundException( String message )
+	public ProductNotFoundException( String message )
 	{
 		super( message );
 	}

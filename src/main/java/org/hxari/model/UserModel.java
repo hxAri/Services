@@ -1,117 +1,63 @@
 package org.hxari.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
-import org.hxari.payload.request.SignInRequest;
+import org.hxari.model.RoleModel.Role;
 import org.hxari.payload.request.UserInfoRequest;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-
-@Entity
-@Table( name="users" )
 public class UserModel {
-	
-	public enum Role {
 
-		ADMIN( "ROLE_ADMIN" ),
-		USER( "ROLE_USER" );
-
-		private String value;
-
-		private Role( String value ) {
-			this.value = value;
-		}
-
-		public String getValue() {
-			return( this.value );
-		}
-
-		public String value() {
-			return( this.value );
-		}
-	}
-
-	@Id
-	@GeneratedValue( strategy=GenerationType.IDENTITY )
-	private Long id;
-
-	@ManyToMany( cascade=CascadeType.ALL, fetch=FetchType.EAGER )
-	@JoinTable(
-		name = "users_roles",
-		joinColumns = @JoinColumn( name="user_id" ),
-		inverseJoinColumns = @JoinColumn(name="role_id" )
-	)
-	@JsonIgnore
-	private Set<RoleModel> roles = new HashSet<>();
-
-	@Column( length=32, name="fullname", nullable=false )
+	private Set<Role> roles;
 	private String fullname;
-
-	@Column( length=48, name="usermail", nullable=false, unique=true )
-	private String usermail;
-
-	@Column( length=30, name="username", nullable=false, unique=true )
 	private String username;
-
-	@Column( length=258, name="password", nullable=false )
-	@JsonIgnore
+	private String usermail;
 	private String password;
 
-	@Column( name="created", nullable = false, updatable=false )
-	private Timestamp created;
+	@JsonFormat( pattern="yyyy-MM-dd'T'HH:mm:ss" )
+	private LocalDateTime created;
 
-	@Column( name="updated", nullable=false, updatable=true )
-	private Timestamp updated;
+	@JsonFormat( pattern="yyyy-MM-dd'T'HH:mm:ss" )
+	private LocalDateTime updated;
 
 	public UserModel() {
+		this.created = this.created != null ? this.created : LocalDateTime.now( ZoneId.of( "Asia/Jakarta" ) );
+		this.updated = this.updated != null ? this.updated : LocalDateTime.now( ZoneId.of( "Asia/Jakarta" ) );
 	}
 
-	public UserModel( SignInRequest signin ) {
-		this.username = signin.username();
-		this.password = signin.password();
-	}
-
-	public UserModel( SignInRequest signin, Set<RoleModel> roles ) {
+	public UserModel( Set<Role> roles ) {
+		this();
 		this.roles = roles;
-		this.username = signin.username();
-		this.password = signin.password();
 	}
 
-	public UserModel( UserInfoRequest body ) {
+	public UserModel( Set<Role> roles, UserInfoRequest body ) {
+		this( roles );
 		this.fullname = body.fullname();
-		this.usermail = body.usermail();
 		this.username = body.username();
+		this.usermail = body.usermail();
 		this.password = body.password();
 	}
 
-	public UserModel( UserInfoRequest body, Set<RoleModel> roles ) {
+	public UserModel( Set<Role> roles, String fullname, String username, String usermail, String password ) {
+		this();
 		this.roles = roles;
-		this.fullname = body.fullname();
-		this.usermail = body.usermail();
-		this.username = body.username();
-		this.password = body.password();
+		this.fullname = fullname;
+		this.username = username;
+		this.usermail = usermail;
+		this.password = password;
 	}
 
-	public Long getId() {
-		return( this.id );
+	public UserModel( Set<Role> roles, String fullname, String username, String usermail, String password, LocalDateTime created, LocalDateTime updated ) {
+		this.roles = roles;
+		this.fullname = fullname;
+		this.username = username;
+		this.usermail = usermail;
+		this.password = password;
+		this.created = created;
+		this.updated = updated;
 	}
 
 	public String getFullname() {
@@ -130,27 +76,16 @@ public class UserModel {
 		return( this.password );
 	}
 
-	public Set<RoleModel> getRoles() {
+	public Set<Role> getRoles() {
 		return( roles );
 	}
 
-	public Timestamp getCreated() {
+	public LocalDateTime getCreated() {
 		return( this.created );
 	}
 
-	public Timestamp getUpdated() {
+	public LocalDateTime getUpdated() {
 		return( this.updated );
-	}
-
-	@PrePersist
-	public void onInsert() {
-		this.created = Timestamp.from( ZonedDateTime.now( ZoneId.of( "Asia/Jakarta" ) ).toInstant() );
-		this.updated = this.created;
-	}
-
-	@PreUpdate
-	public void onUpdate() {
-		this.updated = Timestamp.from( ZonedDateTime.now( ZoneId.of( "Asia/Kolkata" ) ).toInstant() );
 	}
 
 	public UserModel setFullname( String fullname ) {
@@ -173,9 +108,18 @@ public class UserModel {
 		return( this );
 	}
 	
-	public UserModel setRoles( Set<RoleModel> roles ) {
+	public UserModel setRoles( Set<Role> roles ) {
 		this.roles = roles;
 		return( this );
 	}
-	
+
+	public UserModel setUpdated() {
+		return( this.setUpdated( LocalDateTime.now( ZoneId.of( "Asia/Jakarta" ) ) ) );
+	}
+
+	public UserModel setUpdated( LocalDateTime updated ) {
+		this.updated = updated;
+		return( this );
+	}
+
 }

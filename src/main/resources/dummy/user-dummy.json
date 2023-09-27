@@ -1,0 +1,22 @@
+{
+	"mappings": {
+		"properties": {
+			"role": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "keyword"
+					}
+				}
+			},
+			"created": {
+				"type": "date",
+				"format": "yyyy-MM-dd'T'HH:mm:ss"
+			},
+			"updated": {
+				"type": "date",
+				"format": "yyyy-MM-dd'T'HH:mm:ss"
+			}
+		}
+	}
+}
